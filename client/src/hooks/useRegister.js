@@ -1,65 +1,79 @@
-import { useState } from 'react';
 import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-// import { useAuthContext } from './useAuthContext';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useAuthStore } from '../container/auth.store'; // Adjust the import path accordingly
 
 const useRegister = () => {
     const [isLoading, setIsLoading] = useState(false);
-    // const navigate = useNavigate();
-    // const { dispatch } = useAuthContext();
 
-    const register = async (username, fullName, password, confirmPassword, gender, setConfirmPassword, setFullName, setGender, setPassword, setUsername) => {
+    // Access Zustand store actions
+    const { setUser } = useAuthStore((state) => ({
+        setUser: state.setUser
+    }));
+
+    const handleError = (error) => {
+        // Check if error response and data are present
+        if (error.response && error.response.data) {
+            const errorData = error.response.data;
+
+            // Handle multiple error messages
+            if (Array.isArray(errorData.errors)) {
+                errorData.errors.forEach((err) => toast.error(err));
+            } else if (errorData.error) {
+                // Handle a single error message
+                toast.error(errorData.error);
+            } else {
+                // Fallback error message if the structure is unknown
+                toast.error('An unknown error occurred.');
+            }
+        } else {
+            // Handle cases where error response or data is not available
+            toast.error('Error while registering.');
+        }
+    };
+
+
+    const register = async (fullName, username, password, confirmPassword, gender) => {
+
+        console.log("apiUrl", process.env.REACT_APP_API_AUTH);
+
         setIsLoading(true);
-
         try {
-            // Validate passwords
-            if (password !== confirmPassword) {
-                toast.error('Passwords do not match.');
-                setIsLoading(false);
-                return;
-            }
-            if (password.length < 6) {
-                toast.error('Password must be at least 6 characters long.');
-                setIsLoading(false);
-                return;
-            }
-
-            // Make API request with proper body structure (adjust based on your API)
             const response = await axios.post(`${process.env.REACT_APP_API_AUTH}/signup`, {
-                username,
                 fullName,
+                username,
                 password,
                 confirmPassword,
-                gender,
+                gender
             });
 
             const userData = response.data;
 
             if (response.status === 200) {
-                // Clear form fields
-                setUsername('');
-                setPassword('');
-                setFullName('');
-                setConfirmPassword('');
-                setGender('');
+                console.log("user", userData);
 
-                // Dispatch login action or perform any necessary operations
-                // dispatch({ type: 'LOGIN', payload: userData })
 
-                // Store user data in local storage or state
-                localStorage.setItem('user', JSON.stringify(userData));
+                // Use Zustand to set the user state
+                setUser(userData);
 
+                // Optional: redirect or perform other actions
+                // navigate('/'); // Uncomment if using react-router-dom
+
+                // Show a success message
+                toast.success('Register successful!');
             }
         } catch (error) {
-            console.error('Registration error:', error);
-            toast.error(error.response?.data?.error || 'Error while registering, please try again.');
+            console.error("Error while register", error);
+            handleError(error);
+        } finally {
+            setIsLoading(false); // Ensure loading state is reset regardless of success or failure
         }
-
-        setIsLoading(false);
     };
 
-    return { register, isLoading };
+    return {
+        register,
+        isLoading
+    };
 };
 
 export default useRegister;

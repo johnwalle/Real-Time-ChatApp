@@ -1,15 +1,21 @@
 import React from 'react';
+import { useAuthStore } from '../../container/auth.store';
 
-function FriendsList({ friends, selectedFriend, onSelectFriend }) {
+
+function FriendsList({ friends, selectedFriend, onSelectFriend, onLogout }) {
     const getProfilePicUrl = (gender) => {
         // Replace these URLs with actual image URLs or paths to images
         return gender === 'male'
             ? 'https://avatar.iran.liara.run/public/boy'
-            : 'https://avatar.iran.liara.run/public/girl'
+            : 'https://avatar.iran.liara.run/public/girl';
     };
 
+    const { logout } = useAuthStore((state) => ({
+        logout: state.logout,
+    }));
+
     return (
-        <div className="md:w-1/4 w-full bg-gray-100 p-4 border-b md:border-r border-gray-300 overflow-y-auto md:border-b-0">
+        <div className="relative md:w-1/4 w-full bg-gray-100 p-4 border-b md:border-r border-gray-300 overflow-y-auto md:border-b-0 h-screen">
             <h2 className="text-xl font-semibold mb-4">Friends</h2>
             <ul>
                 {friends.map(({ name, gender }) => (
@@ -27,6 +33,12 @@ function FriendsList({ friends, selectedFriend, onSelectFriend }) {
                     </li>
                 ))}
             </ul>
+            <button
+                onClick={logout}
+                className="absolute bottom-3 w-1/4 bg-red-500 text-white py-2 rounded-t hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+                Logout
+            </button>
         </div>
     );
 }

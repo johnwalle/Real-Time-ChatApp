@@ -1,14 +1,16 @@
 import axios from 'axios';
 import { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-// import { useAuthContext } from './useAuthContext';
+import { useAuthStore } from '../container/auth.store'; // Adjust the import path accordingly
 
 const useLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
-    
-    // const navigate = useNavigate();
-    // const { dispatch } = useAuthContext();
+
+    // Access Zustand store actions
+    const { setUser } = useAuthStore((state) => ({
+        setUser: state.setUser
+    }));
+
 
     const login = async (username, password, setUsername, setPassword) => {
         setIsLoading(true);
@@ -25,21 +27,21 @@ const useLogin = () => {
                 setUsername('');
                 setPassword('');
 
-                // navigate('/');
-                // Dispatch login action or perform any necessary operations
-                // dispatch({ type: 'LOGIN', payload: userData })
+                // Use Zustand to set the user state
+                setUser(userData);
 
-                // Store user data in local storage or state
-                localStorage.setItem('user', JSON.stringify(userData));
+                // Optional: redirect or perform other actions
+                // navigate('/'); // Uncomment if using react-router-dom
 
-                // context
-                // setUser(userData)
+                // Show a success message
+                toast.success('Login successful!');
             }
         } catch (error) {
-            console.error("error while logging", error);
+            console.error("Error while logging in", error);
             toast.error(error.response?.data?.error || 'Error while logging in.');
+        } finally {
+            setIsLoading(false); // Ensure loading state is reset regardless of success or failure
         }
-        setIsLoading(false);
     };
 
     return {
