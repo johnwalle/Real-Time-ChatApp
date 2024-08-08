@@ -1,35 +1,49 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useAuthStore } from '../../container/auth.store';
+import { useUserStore } from '../../container/user.store';
 
 
-function FriendsList({ friends, selectedFriend, onSelectFriend, onLogout }) {
-    const getProfilePicUrl = (gender) => {
-        // Replace these URLs with actual image URLs or paths to images
-        return gender === 'male'
-            ? 'https://avatar.iran.liara.run/public/boy'
-            : 'https://avatar.iran.liara.run/public/girl';
-    };
+function FriendsList({ selectedFriend, onSelectFriend }) {
 
-    const { logout } = useAuthStore((state) => ({
+
+    const { user, logout } = useAuthStore((state) => ({
         logout: state.logout,
+        user: state.user
     }));
+
+    const { friends, fetchFriends } = useUserStore(state => ({
+        friends: state.friends,
+        fetchFriends: state.fetchFriends
+    }));
+
+
+    console.log('fetched friends', friends);
+
+    const token = user?.token;
+
+    useEffect(() => {
+        if (token) {
+            fetchFriends(token); // Fetch friends when component mounts or token changes
+        }
+    }, [token, fetchFriends]);
+
 
     return (
         <div className="relative md:w-1/4 w-full bg-gray-100 p-4 border-b md:border-r border-gray-300 overflow-y-auto md:border-b-0 h-screen">
             <h2 className="text-xl font-semibold mb-4">Friends</h2>
             <ul>
-                {friends.map(({ name, gender }) => (
+                {friends.map(({ _id, fullName, avatar }) => (
                     <li
-                        key={name}
-                        className={`flex items-center p-2 cursor-pointer hover:bg-gray-200 ${selectedFriend === name ? 'bg-gray-300' : ''}`}
-                        onClick={() => onSelectFriend(name)}
+                        key={_id}
+                        className={`flex items-center p-2 cursor-pointer hover:bg-gray-200 ${selectedFriend === _id ? 'bg-gray-300' : ''}`}
+                        onClick={() => onSelectFriend(_id)}
                     >
                         <img
-                            src={getProfilePicUrl(gender)}
-                            alt={`${name}'s profile`}
+                            src={avatar}
+                            alt={`${fullName}'s profile`}
                             className="w-10 h-10 rounded-full mr-3"
                         />
-                        {name}
+                        {fullName}
                     </li>
                 ))}
             </ul>
