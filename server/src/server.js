@@ -6,7 +6,9 @@ const cors = require('cors');
 require('colors');
 require('dotenv').config();
 
+
 const authRouter = require('./routes/auth.route');
+const userROuter = require('./routes/user.route');
 const connectDB = require('./config/db');
 
 const app = express();
@@ -20,6 +22,8 @@ connectDB();
 
 // Set up routes
 app.use('/api/auth', authRouter);
+app.use('/api/users', userROuter);
+
 
 const server = http.createServer(app);
 const io = socketIO(server, {
