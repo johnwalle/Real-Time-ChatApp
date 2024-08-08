@@ -17,7 +17,7 @@ const registerUser = async ({ username, fullName, password, gender }) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Set profile picture based on gender
-    const profilePic = gender === 'male'
+    const avatar = gender === 'male'
         ? `${avatarBaseUrl}/boy?username=${username}`
         : `${avatarBaseUrl}/girl?username=${username}`;
 
@@ -27,14 +27,14 @@ const registerUser = async ({ username, fullName, password, gender }) => {
         username,
         gender,
         password: hashedPassword,
-        profilePic,
+        avatar,
     });
 
     return {
         id: newUser._id,
         fullName: newUser.fullName,
         username: newUser.username,
-        profilePic: newUser.profilePic,
+        avatar: newUser.avatar,
         token: generateToken(newUser._id),
     };
 };
@@ -58,7 +58,7 @@ const authenticateUser = async ({ username, password }) => {
         _id: user._id,
         fullName: user.fullName,
         username: user.username,
-        profilePic: user.profilePic,
+        avatar: user.avatar,
         token: generateToken(user._id),
     };
 };

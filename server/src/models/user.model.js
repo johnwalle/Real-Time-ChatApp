@@ -27,6 +27,10 @@ const userModel = new Schema({
         trim: true,
         minlength: 8,
     },
+    avatar: {
+        type: String,
+        required: true,
+    }
 
 }, { timestamps: true });
 

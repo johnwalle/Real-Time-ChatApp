@@ -6,32 +6,34 @@ const cors = require('cors');
 require('colors');
 require('dotenv').config();
 
-
-const authRouter = require('./routes/auth.route')
-const connectDB = require('./config/db')
+const authRouter = require('./routes/auth.route');
+const connectDB = require('./config/db');
 
 const app = express();
 app.use(express.json());
 
+// Middleware to handle CORS
+app.use(cors()); // Allow requests from all origins
 
-//middlewares
+// Connect to the database
 connectDB();
 
+// Set up routes
 app.use('/api/auth', authRouter);
 
 const server = http.createServer(app);
 const io = socketIO(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: '*', // Allow all origins
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
   }
 });
 
-
-
+// Define the Message model
 const Message = mongoose.model('Message', { user: String, text: String, createdAt: { type: Date, default: Date.now } });
 
+// Handle socket connections
 io.on('connection', (socket) => {
   console.log('a user connected'.red.bold);
 
