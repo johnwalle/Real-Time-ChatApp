@@ -1,34 +1,53 @@
 const express = require('express');
-const app = express();
-require('colors')
-http = require('http');
+const mongoose = require('mongoose');
+const http = require('http');
+const socketIO = require('socket.io');
 const cors = require('cors');
-const { Server } = require('socket.io'); // Add this
+require('colors');
+require('dotenv').config();
 
 
-app.use(cors()); // Add cors middleware
+const authRouter = require('./routes/auth.route')
+const connectDB = require('./config/db')
 
-const server = http.createServer(app); // Add this
+const app = express();
+app.use(express.json());
 
-// Add this
-// Create an io server and allow for CORS from http://localhost:3000 with GET and POST methods
-const io = new Server(server, {
-    cors: {
-        origin: 'http://localhost:3000',
-        methods: ['GET', 'POST'],
-    },
+
+//middlewares
+connectDB();
+
+app.use('/api/auth', authRouter);
+
+const server = http.createServer(app);
+const io = socketIO(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
+  }
 });
 
-// Add this
-// Listen for when the client connects via socket.io-client
+
+
+const Message = mongoose.model('Message', { user: String, text: String, createdAt: { type: Date, default: Date.now } });
+
 io.on('connection', (socket) => {
-    console.log(`User connected ${socket.id}`.red);
-    // We can write our socket event listeners in here...
+  console.log('a user connected'.red.bold);
+
+  socket.on('chat message', async (msg) => {
+    const message = new Message(msg);
+    await message.save();
+    io.emit('chat message', msg);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
 });
 
+const port = process.env.PORT || 5000;
 
-// const port = process.env.PORT || 5000;
-//listening the server
-server.listen(8000, () => {
-    console.log(`Server is running on port 8000`.cyan.bold)
-})
+server.listen(port, () => {
+  console.log(`listening on *:${port}`.cyan.bold);
+});
