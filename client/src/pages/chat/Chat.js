@@ -26,7 +26,6 @@ function Chat() {
         <div className="flex flex-col md:flex-row h-screen overflow-hidden">
             {/* Friends List */}
             <FriendsList
-                friends={friends}
                 selectedFriend={selectedFriend}
                 onSelectFriend={setSelectedFriend}
             />

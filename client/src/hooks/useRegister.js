@@ -33,18 +33,18 @@ const useRegister = () => {
     };
 
 
-    const register = async (fullName, username, password, confirmPassword, gender) => {
+    const register = async (username, fullName, password, confirmPassword, gender,) => {
 
-        console.log("apiUrl", process.env.REACT_APP_API_AUTH);
+
 
         setIsLoading(true);
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_AUTH}/signup`, {
-                fullName,
                 username,
+                fullName,
                 password,
                 confirmPassword,
-                gender
+                gender,
             });
 
             const userData = response.data;

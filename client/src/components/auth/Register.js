@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MdRemoveRedEye } from 'react-icons/md';
 import { IoEyeOffSharp } from 'react-icons/io5';
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import useRegister from '../../hooks/useRegister';
-
 
 const RegisterPage = () => {
     const [gender, setGender] = useState('');
@@ -14,7 +13,9 @@ const RegisterPage = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const inputRef = useRef();
 
-    const { error, isLoading, register } = useRegister()
+
+
+    const { error, isLoading, register } = useRegister();
 
     const [showPassword, setShowPassword] = useState(false);
     const [showPassword2, setShowPassword2] = useState(false);
@@ -22,36 +23,28 @@ const RegisterPage = () => {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
+    
     const togglePasswordVisibility2 = () => {
         setShowPassword2(!showPassword2);
     };
 
-    // useEffect(() => {
-    //     if (isLoading) {
-
-    //     }
-    //     inputRef.current.focus()
-    // }, [])
-
-
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await register(username, fullName, password, confirmPassword, gender, setConfirmPassword, setFullName, setGender, setPassword, setUsername)
+        await register(username, fullName, password, confirmPassword, gender);
+
     };
 
     return (
-        <div className="flex flex-col  items-center justify-center h-screen">
+        <div className="flex flex-col items-center justify-center h-screen">
             <div className="bg-white px-6 py-8 shadow-md rounded-md w-80">
-                <h2 className="instagarm-heading text-center text-4xl font-bold mb-6">Chat App</h2>
-                <h1 className="font-thin text-center pb-6">Sign up to chat and share thoughts  with your friends.</h1>
+                <h2 className="text-center text-4xl font-bold mb-6">Chat App</h2>
+                <h1 className="font-thin text-center pb-6">Sign up to chat and share thoughts with your friends.</h1>
                 <hr className="pb-6" />
                 <form onSubmit={handleSubmit}>
                     <input
                         type="text"
                         required
-                        placeholder="full name"
+                        placeholder="Full name"
                         value={fullName}
                         ref={inputRef}
                         onChange={(e) => setFullName(e.target.value)}
@@ -61,7 +54,7 @@ const RegisterPage = () => {
                     <input
                         type="text"
                         required
-                        placeholder="username"
+                        placeholder="Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         className="w-full p-2 mb-4 border border-gray-300 rounded"
@@ -74,7 +67,7 @@ const RegisterPage = () => {
                         className="w-full p-2 mb-4 border border-gray-300 rounded"
                         style={{ fontSize: '14px', backgroundColor: 'white' }}
                     >
-                        <option value="">select gender</option>
+                        <option value="">Select gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                     </select>
@@ -82,7 +75,7 @@ const RegisterPage = () => {
                         <div className="flex">
                             <input
                                 type={showPassword ? 'text' : 'password'}
-                                placeholder="password"
+                                placeholder="Password"
                                 value={password}
                                 required
                                 onChange={(e) => setPassword(e.target.value)}
@@ -97,10 +90,10 @@ const RegisterPage = () => {
                                 {showPassword ? <MdRemoveRedEye /> : <IoEyeOffSharp />}
                             </button>
                         </div>
-                        <div className='flex  mt-4'>
+                        <div className='flex mt-4'>
                             <input
                                 type={showPassword2 ? 'text' : 'password'}
-                                placeholder="confirm password"
+                                placeholder="Confirm password"
                                 value={confirmPassword}
                                 required
                                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -141,8 +134,6 @@ const RegisterPage = () => {
                     </Link>
                 </div>
             </div>
-
-
         </div>
     );
 };
