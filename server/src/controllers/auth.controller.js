@@ -7,7 +7,6 @@ const { validatePasswordStrength } = require('../utils/validatePasswordStrength'
 const signUpUser = async (req, res) => {
     try {
         const { username, fullName, password, confirmPassword, gender } = req.body;
-
         // Check if all fields are filled
         if (!username || !fullName || !password || !confirmPassword || !gender) {
             return res.status(400).json({ error: 'Please fill in all the fields.' });

@@ -1,6 +1,10 @@
 const { getAllUsersExceptLoggedIn } = require('../services/user.service');
+const User = require('../models/user.model')
+
 
 const getUsers = async (req, res) => {
+
+    
     try {
         const loggedUserId = req.user.id;
 
@@ -14,4 +18,11 @@ const getUsers = async (req, res) => {
     }
 };
 
-module.exports = { getUsers };
+const getUserById = async (id) => {
+    const user = await User.findOne({ _id: id }).select('-password');
+    return user;
+};
+
+
+
+module.exports = { getUsers, getUserById };
