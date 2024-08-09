@@ -9,6 +9,7 @@ require('dotenv').config();
 
 const authRouter = require('./routes/auth.route');
 const userROuter = require('./routes/user.route');
+const chatRouter = require('./routes/chat.route')
 const connectDB = require('./config/db');
 
 const app = express();
@@ -23,7 +24,7 @@ connectDB();
 // Set up routes
 app.use('/api/auth', authRouter);
 app.use('/api/users', userROuter);
-
+app.use('/api/chat', chatRouter)
 
 const server = http.createServer(app);
 const io = socketIO(server, {

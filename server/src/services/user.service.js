@@ -12,4 +12,10 @@ const getAllUsersExceptLoggedIn = async (loggedUserId) => {
     }
 };
 
-module.exports = { getAllUsersExceptLoggedIn };
+const getuser = (id) => {
+    const user = User.findOne({ _id: id }).select('-password');
+    return user;
+}
+
+
+module.exports = { getAllUsersExceptLoggedIn, getuser };

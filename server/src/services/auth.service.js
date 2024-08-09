@@ -6,6 +6,7 @@ const generateToken = require('../utils/generateToken');
 const avatarBaseUrl = 'https://avatar.iran.liara.run/public';
 
 const registerUser = async ({ username, fullName, password, gender }) => {
+    
     // Check if user already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
