@@ -4,6 +4,7 @@ const User = require('../models/user.model')
 const authMiddleware = async (req, res, next) => {
     let token;
 
+
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
             // Get token from the authorization header

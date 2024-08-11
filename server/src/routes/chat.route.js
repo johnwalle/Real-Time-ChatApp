@@ -7,7 +7,7 @@ const  authMiddleware  = require('../middlewares/authMiddleware'); // Ensure you
 chatRouter.post('/send', authMiddleware, sendMessage);
 
 // Get messages between two users
-chatRouter.get('/get', authMiddleware, getMessages);
+chatRouter.get('/getMessages/:friendId', authMiddleware, getMessages);
 
 
 module.exports = chatRouter;
