@@ -11,6 +11,7 @@ function FriendsList({ selectedFriend, onSelectFriend }) {
         user: state.user
     }));
 
+    
     const { friends, fetchFriends } = useUserStore(state => ({
         friends: state.friends,
         fetchFriends: state.fetchFriends
@@ -20,6 +21,7 @@ function FriendsList({ selectedFriend, onSelectFriend }) {
     console.log('fetched friends', friends);
 
     const token = user?.token;
+
 
     useEffect(() => {
         if (token) {
