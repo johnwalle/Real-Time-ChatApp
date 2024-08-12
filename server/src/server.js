@@ -18,7 +18,7 @@ app.use(express.json());
 const server = http.createServer(app);
 const io = initializeSocketIO(server, {
   cors: {
-    origin: process.env.REACT_APP_ORIGIN || 'http://localhost:3000', // Allow the React app's origin
+    origin: "https://real-time-chat-app-vert.vercel.app", // Allow the React app's origin
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
   }
@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 // Middleware to handle CORS
 app.use(
   cors({
-    origin: process.env.REACT_APP_ORIGIN || 'http://localhost:3000', // Allow the React app's origin
+    origin: "https://real-time-chat-app-vert.vercel.app", // Allow the React app's origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
   })
