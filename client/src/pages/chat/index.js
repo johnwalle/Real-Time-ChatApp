@@ -5,7 +5,6 @@ import ChatArea from '../../components/chat/ChatArea';
 import { useAuthStore } from '../../container/auth.store';
 import { useMessageStore } from '../../container/message.store';
 
-
 function Chat() {
     const [selectedFriend, setSelectedFriend] = useState(null);
     const [socket, setSocket] = useState(null);
