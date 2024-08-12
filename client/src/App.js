@@ -2,7 +2,7 @@ import './App.css';
 import { useState } from 'react'; // Add this
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import io from 'socket.io-client'; // Add this
-import Chat from './pages/chat/Chat'; // Add this
+import Chat from './pages/chat'; // Add this
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import { Toaster } from 'react-hot-toast'; // Import Toaster for notifications

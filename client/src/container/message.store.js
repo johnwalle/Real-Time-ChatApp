@@ -3,10 +3,13 @@ import axios from 'axios';
 
 export const useMessageStore = create((set) => ({
     chats: [], // State to store messages
+    isLoading: false, // State to track loading state
     fetchMessages: async (token, friendId) => {
         console.log("friendId", friendId, 'token', token, "api-url", process.env.REACT_APP_API_CHAT);
 
         try {
+            set({ isLoading: true }); // Set loading state to true before fetching
+
             const response = await axios.get(`${process.env.REACT_APP_API_CHAT}/getMessages/${friendId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -14,11 +17,12 @@ export const useMessageStore = create((set) => ({
                 }
             });
 
-            set({ chats: response.data });
+            set({ chats: response.data, isLoading: false }); // Update chats and set loading state to false
             console.log('fetched messages', response.data);
+            
         } catch (error) {
             console.error('Error fetching messages:', error);
-            set({ chats: [] }); // Handle the error case
+            set({ chats: [], isLoading: false }); // Handle the error case and set loading state to false
         }
     }
 }));

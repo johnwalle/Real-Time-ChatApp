@@ -1,67 +1,100 @@
-import React, { useState, useEffect } from 'react';
-import socketIOClient from 'socket.io-client';
-import styles from './styles.module.css';
-const ENDPOINT = 'http://localhost:3001';
+import React, { useState, useEffect, useCallback } from 'react';
+import io from 'socket.io-client';
+import FriendsList from '../../components/chat/FriendsList';
+import ChatArea from '../../components/chat/ChatArea';
+import { useAuthStore } from '../../container/auth.store';
+import { useMessageStore } from '../../container/message.store';
 
-function App() {
-    const [messages, setMessages] = useState([]);
-    const [user, setUser] = useState('');
-    const [message, setMessage] = useState('');
+
+function Chat() {
+    const [selectedFriend, setSelectedFriend] = useState(null);
     const [socket, setSocket] = useState(null);
+    const [token, setToken] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [message, setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const { user } = useAuthStore((state) => ({
+        user: state.user,
+    }));
+
+    const { fetchMessages, chats } = useMessageStore((state) => ({
+        fetchMessages: state.fetchMessages,
+        chats: state.chats,
+    }));
+
+    const userId = user?._id;
 
     useEffect(() => {
-        const newSocket = socketIOClient(ENDPOINT);
+        // Connect to the Socket.IO server
+        const newSocket = io(`${process.env.REACT_APP_API}`);
+        
         setSocket(newSocket);
+        setToken(user.token);
+        // Join the chat room for the current user
+        newSocket.emit('join room', userId);
 
-        newSocket.on('connect', () => {
-            console.log('Connected to the WebSocket server');
+        // Listen for incoming messages
+        newSocket.on('new message', (data) => {
+            setMessages((prevMessages) => [...prevMessages, data]);
         });
 
-        newSocket.on('chat message', (msg) => {
-            setMessages((messages) => [...messages, msg]);
-        });
-
+        // Clean up the socket connection on component unmount
         return () => {
             newSocket.disconnect();
         };
-    }, []);
+    }, [userId, user.token]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (message.trim() && user.trim()) {
-            socket.emit('chat message', { user, text: message });
-            setMessage('');
+    useEffect(() => {
+        // Fetch the chat messages for the selected friend
+        if (selectedFriend) {
+            const fetchData = async () => {
+                try {
+                    setIsLoading(true);
+                    await fetchMessages(user.token, selectedFriend);
+                    setMessages(chats);
+                } catch (error) {
+                    console.error('Error fetching messages:', error);
+                    setMessages([]);
+                } finally {
+                    // Set the loading state to false after the data is fetched
+                    setIsLoading(false);
+                }
+            };
+            fetchData();
+        } else {
+            setMessages([]);
+            setIsLoading(false);
         }
-    };
+    }, [selectedFriend, userId, user.token, fetchMessages, chats]);
+
+    const handleSubmit = useCallback(
+        (e) => {
+            e.preventDefault();
+            if (message.trim() && selectedFriend) {
+                // Send the message through the Socket.IO connection
+                socket.emit('send message', { senderId: userId, receiverId: selectedFriend, text: message });
+                // Update the local messages state
+                setMessages((prevMessages) => [...prevMessages, { senderId: userId, receiverId: selectedFriend, text: message, createdAt: new Date() }]);
+                setMessage('');
+            }
+        },
+        [message, selectedFriend, socket, userId]
+    );
 
     return (
-        <div className={styles.container}>
-            <div className={styles.messageContainer}>
-                {messages.map((msg, index) => (
-                    <div key={index} className={styles.messageItem}>
-                        <strong>{msg.user}</strong>: {msg.text}
-                    </div>
-                ))}
-            </div>
-            <form className={styles.form} onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    value={user}
-                    onChange={(e) => setUser(e.target.value)}
-                    placeholder="Your name"
-                    required
-                />
-                <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Type a message"
-                    required
-                />
-                <button type="submit">Send</button>
-            </form>
+        <div className="flex flex-col md:flex-row h-screen overflow-hidden">
+            {/* Friends List */}
+            <FriendsList selectedFriend={selectedFriend} onSelectFriend={setSelectedFriend} />
+
+            {/* Chat Area */}
+            <ChatArea
+                selectedFriend={selectedFriend}
+                user={userId}
+                messages={messages}
+                isLoading={isLoading}
+            />
         </div>
     );
 }
 
-export default App;
+export default Chat;
